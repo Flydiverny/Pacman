@@ -12,6 +12,7 @@ namespace nadilus {
 				int getType(void);
 				void setType(int type);
 				char toChar();
+				Point getPoint(void);
 
 			private:
 				Point point;

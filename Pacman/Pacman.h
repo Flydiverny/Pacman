@@ -8,13 +8,16 @@ namespace nadilus {
 				Pacman(void);
 				~Pacman(void);
 
-				void setDirection(int dx, int dy);
+				void	setDirection(int dx, int dy);
 
-				Point& getPoint();
-				void setPoint(Point p);
+				Point&	getPoint();
+				Point	getNextPoint();
+				void	setPoint(Point p);
+				void	move(void);
+				bool	isMoving(void);
 			private:
-				Point point;
-				short dx,dy;
+				Point	point;
+				short	dx,dy;
 		};
 	}
 }

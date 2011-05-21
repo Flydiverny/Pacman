@@ -11,21 +11,26 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Highscore.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Pacman.cpp" />
     <ClCompile Include="PacmanGame.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Point.cpp" />
     <ClCompile Include="Tile.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Highscore.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="Pacman.h" />
     <ClInclude Include="PacmanGame.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="Tile.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
     <None Include="map.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

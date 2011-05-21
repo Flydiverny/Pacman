@@ -19,6 +19,16 @@ namespace nadilus {
 			return this->point;
 		}
 
+		Point Pacman::getNextPoint(void) {
+			return Point(this->point.x+dx, this->point.y+dy);
+		}
+
+		bool Pacman::isMoving(void) {
+			Point p = this->getPoint();
+			Point n = this->getNextPoint();
+			return !(p.x == n.x && p.y == n.y);
+		}
+
 		void Pacman::setPoint(Point p) {
 			this->point = p;
 		}
@@ -30,6 +40,10 @@ namespace nadilus {
 			if(dy <= 1 && dy >= -1) {
 				this->dy = dy;
 			}
+		}
+
+		void Pacman::move(void) {
+			this->point = this->getNextPoint();
 		}
 	}
 }

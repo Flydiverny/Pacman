@@ -24,6 +24,10 @@ namespace nadilus {
 			return this->type;
 		}
 
+		Point Tile::getPoint(void) {
+			return this->point;
+		}
+
 		char Tile::toChar() {
 			switch(this->getType()) {
 				case 0:

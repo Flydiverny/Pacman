@@ -22,7 +22,7 @@ namespace nadilus {
 		void Map::readMap(std::string filename) {
 			std::ifstream data(filename);
 			std::string line = "";
-
+			spawnSet = false;
 			std::vector<Tile*> list;
 			if(data) {
 				int row = 0;
@@ -65,6 +65,9 @@ namespace nadilus {
 		}
 
 		void Map::resetMap(void) {
+			this->tiles = NULL;
+			this->rows = 0;
+			this->columns = 0;
 		}
 
 		int Map::getRows(void) {
@@ -98,6 +101,25 @@ namespace nadilus {
 				default:
 					return -1;
 			}
+		}
+
+		bool Map::hasFood(void) {
+			for(int r = 0; r < getRows(); r++) {
+				for(int c = 0; c < getColumns(); c++) {
+					if(getTile(c,r).getType() == 0)
+						return true;
+				}
+			}
+
+			return false;
+		}
+
+		void Map::setDrawPoint(Point p) {
+			this->drawPoint = p;
+		}
+
+		Point Map::getDrawPoint(void) {
+			return this->drawPoint;
 		}
 	}
 }

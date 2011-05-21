@@ -4,6 +4,7 @@ namespace nadilus {
 		class Point {
 			public:
 				Point(void);
+				Point(int x, int y) : x(x), y(y) {}
 				~Point(void);
 				int x;
 				int y;
