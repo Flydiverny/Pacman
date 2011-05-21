@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "Util.cpp"
 
 namespace nadilus {
 	namespace pacman {
@@ -13,6 +14,7 @@ namespace nadilus {
 		}
 
 		void Player::setName(std::string name) {
+			findAndReplace<std::string>(name," ", "_");
 			this->name = name;
 		}
 

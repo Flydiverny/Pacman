@@ -7,19 +7,16 @@
 
 namespace nadilus {
 	namespace pacman {
-		Map::Map(void)
+		Map::Map(std::string filename)
 		{
-			//initMap();
+			this->filename = filename;
 			spawnSet = false;
+			readMap();
 		}
 
 		Map::~Map(void) {}
 
-		void Map::initMap(void) {
-
-		}
-
-		void Map::readMap(std::string filename) {
+		void Map::readMap(void) {
 			std::ifstream data(filename);
 			std::string line = "";
 			spawnSet = false;
@@ -58,7 +55,7 @@ namespace nadilus {
 				this->tiles = (Tile**) malloc(list.size() * sizeof(Tile*));
 				this->rows = list.size();
 
-				for(int i = 0; i < list.size(); i++) {
+				for(unsigned i = 0; i < list.size(); i++) {
 					tiles[i] = list.at(i);
 				}
 			}
@@ -70,11 +67,11 @@ namespace nadilus {
 			this->columns = 0;
 		}
 
-		int Map::getRows(void) {
+		unsigned Map::getRows(void) {
 			return this->rows;
 		}
 
-		int Map::getColumns(void) {
+		unsigned Map::getColumns(void) {
 			return this->columns;
 		}
 
@@ -104,22 +101,14 @@ namespace nadilus {
 		}
 
 		bool Map::hasFood(void) {
-			for(int r = 0; r < getRows(); r++) {
-				for(int c = 0; c < getColumns(); c++) {
+			for(unsigned r = 0; r < getRows(); r++) {
+				for(unsigned c = 0; c < getColumns(); c++) {
 					if(getTile(c,r).getType() == 0)
 						return true;
 				}
 			}
 
 			return false;
-		}
-
-		void Map::setDrawPoint(Point p) {
-			this->drawPoint = p;
-		}
-
-		Point Map::getDrawPoint(void) {
-			return this->drawPoint;
 		}
 	}
 }

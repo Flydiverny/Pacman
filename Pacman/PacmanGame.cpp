@@ -11,10 +11,9 @@ namespace nadilus {
 	namespace pacman {
 		PacmanGame::PacmanGame(void) {
 			score = 0;
-			map.readMap("map.txt");
-			map.setDrawPoint(Point(3,2));
-
-			//highscore.readHighscore("highscore.txt");
+			this->map = Map("map.txt");
+			this->highscore = Highscore("score.txt");
+			this->drawPoint = Point(3,2);
 			
 			initialize();
 		}
@@ -23,16 +22,15 @@ namespace nadilus {
 		}
 	
 		void PacmanGame::initialize(void) {
-			printHighscore();
+			printHighscore(-1);
 			printScore();
 
 			printMsg("Welcome to Pacman!");
 			Sleep(200);
 			printMsg("Please enter your name: ");
 
-			string playerName;
-
-			cin >> playerName;
+			char playerName[8];
+			cin.get(playerName, 9);
 
 			player.setName(playerName);
 
@@ -42,7 +40,8 @@ namespace nadilus {
 				printMap();
 				printMsg("Good Luck " + player.getName() +"!");
 				playGame();
-				map.readMap("map.txt");
+				highscore.saveHighscore();
+				this->map = Map("map.txt");
 			} while(playAgain());
 
 			printMsg("Good Bye " + player.getName() + " it was fun playing with you!");
@@ -65,11 +64,12 @@ namespace nadilus {
 		}
 
 		void PacmanGame::printMap(void) {
-			for(int i = 0; i < map.getRows(); i++) {
-				for(int x = 0; x < map.getColumns(); x++) {
+			for(unsigned i = 0; i < map.getRows(); i++) {
+				for(unsigned x = 0; x < map.getColumns(); x++) {
 					printTile(map.getTile(x,i));
-					Sleep(7);
+					//Sleep(7);
 				}
+				Sleep(20);
 			}
 
 			Point spawn = map.getSpawn();
@@ -87,7 +87,7 @@ namespace nadilus {
 		}
 
 		void PacmanGame::printPacman(void) {
-			Point mp = map.getDrawPoint();
+			Point mp = drawPoint;
 			Point p = this->pacman.getPoint();
 			gotoxy(p.x,p.y);
 			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 250);
@@ -97,16 +97,16 @@ namespace nadilus {
 		void PacmanGame::printMsg(string msg) {
 			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
 
-			for(int i = 0; i < map.getColumns(); i++) {
+			for(unsigned i = 0; i < map.getColumns(); i++) {
 				gotoxy(0+i,map.getRows());
 				cout << " ";
 			}
 
-			for(int i = 0; i < msg.length(); i++) {
+			for(unsigned i = 0; i < msg.length(); i++) {
 				gotoxy(0+i,map.getRows());
 				cout << msg.at(i);
 
-				Sleep(55);
+				Sleep(45);
 			}
 		}
 
@@ -114,10 +114,11 @@ namespace nadilus {
 			int moveLoops = 4;
 			int currentLoop = 0;
 
-			while(map.hasFood()) {
+			while(true) {
+				if(!map.hasFood()) break;
 				Sleep(50);
 
-				if(kbhit()) changeDirection(getDirectionFromKeyboard());
+				if(_kbhit()) changeDirection(getDirectionFromKeyboard());
 				
 				if(currentLoop < moveLoops) currentLoop++;
 				else {
@@ -128,14 +129,17 @@ namespace nadilus {
 				setScore(-1);
 
 				printScore();
+				if(!map.hasFood()) break;
 			}
 
-			if(score > player.getHighscore()) {
+			//Could uncomment if we want to save the highestscore only for player
+			//but currently theres no real point with that
+			//if(score >= player.getHighscore()) {
 				player.setHighscore(score);
-				highscore.addPlayer(player);
-			}
+				int position = highscore.addPlayer(player);
+			//}
 
-			printHighscore();
+			printHighscore(position);
 		}
 
 		void PacmanGame::setScore(int s) {
@@ -143,7 +147,7 @@ namespace nadilus {
 			if(score < 0) score = 0;
 		}
 
-		void PacmanGame::printHighscore(void) {
+		void PacmanGame::printHighscore(int position) {
 			gotoxy(map.getColumns()+3,-1);
 			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
 			cout << "Highscore List ";
@@ -153,8 +157,12 @@ namespace nadilus {
 			
 			deque<Player> list = this->highscore.getList();
 
-			for(int i = 0; i < map.getRows()-2; i++) {
+			for(unsigned i = 0; i < map.getRows()-2; i++) {
 				if(list.size() < i+1) break;
+
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
+				if(i == position) SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 13);
+				
 				gotoxy(map.getColumns()+3,1+i);
 				cout << "                       ";
 				gotoxy(map.getColumns()+3,1+i);
@@ -174,17 +182,20 @@ namespace nadilus {
 			gotoxy(map.getColumns()+3,map.getRows()-1);
 			cout << splitter;
 
-			if(list.size() > map.getRows()-3 && player.getHighscore() <= list.at(map.getRows()-3).getHighscore()) {
-				gotoxy(map.getColumns()+3,map.getRows());
-				cout << "-- " << player.getName();
+			if(position > -1) {
+				if(list.size() > map.getRows()-3 && player.getHighscore() <= list.at(map.getRows()-3).getHighscore()) {
+					SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 13);
+					gotoxy(map.getColumns()+3,map.getRows());
+					cout << position << " " << player.getName();
 
-				int score = player.getHighscore();
-				if(score < 10) gotoxy(map.getColumns()+2+splitter.length(),map.getRows());
-				else if(score < 100) gotoxy(map.getColumns()+2+splitter.length()-1,map.getRows());
-				else if(score < 1000) gotoxy(map.getColumns()+2+splitter.length()-2,map.getRows());
-				else if(score < 10000) gotoxy(map.getColumns()+2+splitter.length()-3,map.getRows());
-				else if(score < 100000) gotoxy(map.getColumns()+2+splitter.length()-4,map.getRows());
-				cout << score;
+					int score = player.getHighscore();
+					if(score < 10) gotoxy(map.getColumns()+2+splitter.length(),map.getRows());
+					else if(score < 100) gotoxy(map.getColumns()+2+splitter.length()-1,map.getRows());
+					else if(score < 1000) gotoxy(map.getColumns()+2+splitter.length()-2,map.getRows());
+					else if(score < 10000) gotoxy(map.getColumns()+2+splitter.length()-3,map.getRows());
+					else if(score < 100000) gotoxy(map.getColumns()+2+splitter.length()-4,map.getRows());
+					cout << score;
+				}
 			}
 		}
 
@@ -210,20 +221,23 @@ namespace nadilus {
 
 			Point pmp = pacman.getPoint();
 
-			Tile& t = map.getTile(pmp.x,pmp.y);
-			
-			t.setType(2);
-			printTile(t);
-
 			if(map.getTile(np.x,np.y).getType() == 0) setScore(50);
 			else if(pacman.isMoving()) setScore(-10);
+
+			
+			Tile& t = map.getTile(pmp.x,pmp.y);
+			Tile& t2 = map.getTile(np.x,np.y);
+			
+			t.setType(2);
+			t2.setType(2);
+			printTile(t);
 
 			pacman.move();
 			printPacman();
 		}
 
 		Point PacmanGame::getDirectionFromKeyboard(void) {
-			switch(getch()){
+			switch(_getch()){
 				case 77:
 					return Point(1, 0);
 				case 75:
@@ -248,7 +262,7 @@ namespace nadilus {
 
 		void PacmanGame::gotoxy(int x, int y) {
 			COORD coord;
-			Point mp = map.getDrawPoint();
+			Point mp = drawPoint;
 			coord.X = x+mp.x;
 			coord.Y = y+mp.y;
 			SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);

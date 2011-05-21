@@ -6,13 +6,14 @@ namespace nadilus {
 	namespace pacman {
 		class Map {
 			public:
-				Map(void);
+				Map(void) {}
+				Map(std::string);
 				~Map(void);
 				void	resetMap(void);
-				int		getRows(void);
-				int		getColumns(void);
+				unsigned getRows(void);
+				unsigned getColumns(void);
 				Point	getSpawn(void);
-				void	readMap(std::string);
+				void	readMap();
 				int		getColor(int type);
 				Tile**&	getTiles(void);
 				Tile&	getTile(int x, int y);
@@ -21,13 +22,13 @@ namespace nadilus {
 				void	setDrawPoint(Point p);
 
 			private:
-				int		rows;
-				int		columns;
+				unsigned rows;
+				unsigned columns;
 				Point	spawnPoint;
 				bool	spawnSet;
 				void	initMap(void);
 				Point	drawPoint;
-				
+				std::string filename;
 				Tile**	tiles;
 		};
 	}

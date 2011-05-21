@@ -27,11 +27,12 @@ namespace nadilus {
 				void changeDirection(Point p);
 				void movePacman(void);
 				void printScore(void);
-				void printHighscore(void);
+				void printHighscore(int);
 				void setScore(int s);
 				void printMsg(std::string msg);
 				void initialize(void);
 				bool playAgain();
+				Point drawPoint;
 		};
 	}
 }

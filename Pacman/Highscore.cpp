@@ -1,31 +1,55 @@
 #include "Highscore.h"
+#include <fstream>
 
 namespace nadilus {
 	namespace pacman {
-		Highscore::Highscore(void) {
-			this->highscorelist = std::deque<Player>();
+		Highscore::Highscore(std::string filename) {
+			this->list = std::deque<Player>();
+			this->filename = filename;
+			this->readHighscore();
 		}
 
+		Highscore::~Highscore(void)	{}
 
-		Highscore::~Highscore(void)
-		{
+		void Highscore::readHighscore(void) {
+			std::ifstream data(filename);
+			std::string line = "";
+			std::string score = "";
+			if(data) {
+				int row = 0;
+				while ( data >> line && data >> score) {
+					Player p = Player();
+					p.setName(line);
+					p.setHighscore(atoi(score.c_str()));
+					this->list.push_back(p);
+				}
+			}
+		}
+
+		void Highscore::saveHighscore(void) {
+			std::ofstream data(filename);
+			for each(Player p in list) {
+				data << p.getName() << " " << p.getHighscore() << std::endl;
+			}
 		}
 
 		std::deque<Player> Highscore::getList(void) {
-			return this->highscorelist;
+			return this->list;
 		}
 
-		void Highscore::addPlayer(Player p) {
-
-			for(int i = 0; i < highscorelist.size(); i++) {
-				Player ph = highscorelist.at(i);
+		int Highscore::addPlayer(Player p) {
+			for(unsigned i = 0; i < list.size(); i++) {
+				Player ph = list.at(i);
 				if(ph.getHighscore() < p.getHighscore()) {
-					highscorelist.insert(highscorelist.begin()+i,p);
-					return;
+					list.insert(list.begin()+i,p);
+					return i;
 				}
 			}
 
-			highscorelist.push_back(p);
+			if(list.size() < 99)
+				list.push_back(p);
+
+			return list.size();
 		}
 	}
 }
