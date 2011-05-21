@@ -58,6 +58,10 @@ namespace nadilus {
 				for(unsigned i = 0; i < list.size(); i++) {
 					tiles[i] = list.at(i);
 				}
+			} else {
+				std::cout << "Map file not found." << std::endl;
+				system("PAUSE");
+				exit(10);
 			}
 		}
 
