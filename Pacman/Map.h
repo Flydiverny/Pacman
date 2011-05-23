@@ -1,6 +1,7 @@
 #pragma once
 #include "Tile.h"
 #include <string>
+#include "Ghost.h"
 
 namespace nadilus {
 	namespace pacman {
@@ -20,16 +21,21 @@ namespace nadilus {
 				bool	hasFood(void);
 				Point	getDrawPoint(void);
 				void	setDrawPoint(Point p);
+				Ghost*& getGhosts();
+				unsigned getGhostCount();
+				
 
 			private:
 				unsigned rows;
 				unsigned columns;
+				unsigned ghostCount;
 				Point	spawnPoint;
 				bool	spawnSet;
 				void	initMap(void);
 				Point	drawPoint;
 				std::string filename;
 				Tile**	tiles;
+				Ghost*	ghosts;
 		};
 	}
 }

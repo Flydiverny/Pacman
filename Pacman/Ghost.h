@@ -3,11 +3,12 @@
 
 namespace nadilus {
 	namespace pacman {
-		class Pacman : public Creature {
+		class Ghost : public Creature {
 			public:
-				Pacman(void) : Creature() {}
-				~Pacman(void);
+				Ghost(void) : Creature() {}
+				~Ghost(void);
 			private:
 		};
 	}
 }
+

@@ -1,8 +1,8 @@
-#include "Pacman.h"
+#include "Ghost.h"
 
 namespace nadilus {
 	namespace pacman {
-		Pacman::~Pacman(void)
+		Ghost::~Ghost(void)
 		{
 		}
 	}

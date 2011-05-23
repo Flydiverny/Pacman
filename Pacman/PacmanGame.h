@@ -33,6 +33,7 @@ namespace nadilus {
 				void initialize(void);
 				bool playAgain();
 				Point drawPoint;
+				void printGhosts(void);
 		};
 	}
 }

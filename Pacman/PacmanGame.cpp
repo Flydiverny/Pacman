@@ -87,11 +87,22 @@ namespace nadilus {
 		}
 
 		void PacmanGame::printPacman(void) {
-			Point mp = drawPoint;
 			Point p = this->pacman.getPoint();
 			gotoxy(p.x,p.y);
 			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 250);
 			cout << (char) 2;
+		}
+
+		void PacmanGame::printGhosts(void) {
+			Ghost* ghosts = map.getGhosts();
+			unsigned gcount = map.getGhostCount();
+			
+			for(unsigned i = 0; i < gcount; i++) {
+				Point p = ghosts[i].getPoint();
+				gotoxy(p.x,p.y);
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 250);
+				cout << (char) 2;
+			}
 		}
 
 		void PacmanGame::printMsg(string msg) {
@@ -123,10 +134,13 @@ namespace nadilus {
 				if(currentLoop < moveLoops) currentLoop++;
 				else {
 					movePacman();
+					moveGhosts();
 					currentLoop = 0;
 				}
 				
 				setScore(-1);
+
+				printGhosts();
 
 				printScore();
 				if(!map.hasFood()) break;
@@ -235,6 +249,28 @@ namespace nadilus {
 			pacman.move();
 			printPacman();
 		}
+
+		void PacmanGame::movePacman(void) {
+			Point np = pacman.getNextPoint();
+			if(!map.getTile(np.x,np.y).isWalkable()) return;
+
+			Point pmp = pacman.getPoint();
+
+			if(map.getTile(np.x,np.y).getType() == 0) setScore(50);
+			else if(pacman.isMoving()) setScore(-10);
+
+			
+			Tile& t = map.getTile(pmp.x,pmp.y);
+			Tile& t2 = map.getTile(np.x,np.y);
+			
+			t.setType(2);
+			t2.setType(2);
+			printTile(t);
+
+			pacman.move();
+			printPacman();
+		}
+
 
 		Point PacmanGame::getDirectionFromKeyboard(void) {
 			switch(_getch()){

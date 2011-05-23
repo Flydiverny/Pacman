@@ -21,12 +21,17 @@ namespace nadilus {
 			std::string line = "";
 			spawnSet = false;
 			std::vector<Tile*> list;
+			std::vector<Ghost> ghostlist;
 			if(data) {
 				int row = 0;
 				while ( data >> line ) {
 					int length = line.length();
 					this->columns = length;
+					
+					//Cstdlib way
 					Tile* tileLine = (Tile*) malloc(length * sizeof(Tile));
+					// new keyword way (doesnt work for tile since no default constructor
+					//Tile* tileLine = new Tile[length];
 
 					for(int i = 0; i < length; i++) {
 						char temp = line.at(i);
@@ -45,6 +50,12 @@ namespace nadilus {
 							this->spawnSet = true;
 						}
 
+						if(temp == '7') {
+							Ghost g = Ghost();
+							g.setPoint(Point(i,row));
+							ghostlist.push_back(g);
+						}
+
 						tileLine[i] = Tile(atoi(&temp), temp != '1', p);
 					}
 					
@@ -55,8 +66,18 @@ namespace nadilus {
 				this->tiles = (Tile**) malloc(list.size() * sizeof(Tile*));
 				this->rows = list.size();
 
+				//cstdlib C malloc way
+				//this->ghosts = (Ghost*) malloc(ghostlist.size() * sizeof(Ghost));
+				// new keyword c++ way
+				this->ghosts = new Ghost[ghostlist.size()];
+				this->ghostCount = ghostlist.size();
+
+				for(unsigned i = 0; i < ghostlist.size(); i++) {
+					this->ghosts[i] = ghostlist[i];
+				}
+
 				for(unsigned i = 0; i < list.size(); i++) {
-					tiles[i] = list.at(i);
+					tiles[i] = list[i];
 				}
 			} else {
 				std::cout << "Map file not found." << std::endl;
@@ -89,6 +110,14 @@ namespace nadilus {
 
 		Point Map::getSpawn(void) {
 			return this->spawnPoint;
+		}
+
+		Ghost*& Map::getGhosts(void) {
+			return this->ghosts;
+		}
+
+		unsigned Map::getGhostCount(void) {
+			return this->ghostCount;
 		}
 
 		int Map::getColor(int type) {
