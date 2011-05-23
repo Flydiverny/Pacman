@@ -46,7 +46,12 @@ namespace nadilus {
 			return Point(this->dx, this->dy);
 		}
 
+		Point Creature::getLastPoint(void) {
+			return this->lastPoint;
+		}
+
 		void Creature::move(void) {
+			this->lastPoint = point;
 			this->point = this->getNextPoint();
 		}
 	}

@@ -7,6 +7,8 @@ namespace nadilus {
 			public:
 				Ghost(void) : Creature() { this->setDirection(1,0); }
 				~Ghost(void);
+
+				Point* getPaths(void);
 			private:
 		};
 	}

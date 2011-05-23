@@ -38,6 +38,7 @@ namespace nadilus {
 				void moveGhosts(void);
 				void coutScore(int,int,int);
 				void initGhostMovements(void);
+				void checkCollission(void);
 		};
 	}
 }
