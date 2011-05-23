@@ -5,5 +5,13 @@ namespace nadilus {
 		Pacman::~Pacman(void)
 		{
 		}
+
+		bool Pacman::isAlive(void) {
+			return this->alive;
+		}
+
+		void Pacman::setAlive(bool alive) {
+			this->alive = alive;
+		}
 	}
 }

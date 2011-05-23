@@ -5,7 +5,7 @@ namespace nadilus {
 	namespace pacman {
 		class Ghost : public Creature {
 			public:
-				Ghost(void) : Creature() {}
+				Ghost(void) : Creature() { this->setDirection(1,0); }
 				~Ghost(void);
 			private:
 		};

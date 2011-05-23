@@ -18,6 +18,7 @@ namespace nadilus {
 				Highscore highscore;
 				Player player;
 				int score;
+				int ghosttime;
 				void printMap(void);
 				void printTile(Tile t);
 				void printPacman(void);

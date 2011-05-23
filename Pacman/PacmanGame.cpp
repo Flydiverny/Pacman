@@ -4,18 +4,21 @@
 #include <windows.h>
 #include "Point.h"
 #include <conio.h>
+#include <time.h>
 
 using namespace std;
 
 namespace nadilus {
 	namespace pacman {
 		PacmanGame::PacmanGame(void) {
+			srand ( (int) time(NULL) );
 			score = 0;
 			this->map = Map("map.txt");
 			this->highscore = Highscore("score.txt");
 			this->drawPoint = Point(3,2);
 			
 			initialize();
+			
 		}
 
 		PacmanGame::~PacmanGame(void) {
@@ -126,9 +129,7 @@ namespace nadilus {
 			int moveLoops = 4;
 			int currentLoop = 0;
 
-			initGhostMovements();
-
-			while(true) {
+			while(pacman.isAlive()) {
 				if(!map.hasFood()) break;
 				Sleep(50);
 
@@ -139,6 +140,16 @@ namespace nadilus {
 					movePacman();
 					moveGhosts();
 					currentLoop = 0;
+
+					Ghost* ghosts = map.getGhosts();
+					unsigned gcount = map.getGhostCount();
+					for(unsigned i = 0; i < gcount; i++) {
+						if(ghosts[i].getPoint() == pacman.getPoint()) {
+							pacman.setAlive(false);
+							this->printMsg("YOU DIED TROLOL");
+							break;
+						}
+					}
 				}
 				
 				setScore(-1);
@@ -230,8 +241,7 @@ namespace nadilus {
 
 			if(map.getTile(np.x,np.y).getType() == 0) setScore(50);
 			else if(pacman.isMoving()) setScore(-10);
-
-			
+						
 			Tile& t = map.getTile(pmp.x,pmp.y);
 			Tile& t2 = map.getTile(np.x,np.y);
 			
@@ -243,61 +253,52 @@ namespace nadilus {
 			printPacman();
 		}
 
-		void PacmanGame::initGhostMovements(void) {
-			Ghost* ghosts = map.getGhosts();
-			unsigned gcount = map.getGhostCount();
-
-			for(unsigned i = 0; i < gcount; i++) {
-				ghosts[i].setDirection(1, 0);
-				Point np = ghosts[i].getNextPoint();
-
-				int x=0;
-				while(!map.getTile(np.x,np.y).isWalkable() && x < 4) {
-					switch(x) {
-						case 0:
-							ghosts[i].setDirection(1, 0);
-							break;
-						case 1:
-							ghosts[i].setDirection(0, -1);
-							break;
-						case 2:
-							ghosts[i].setDirection(0, 1);
-							break;
-						case 3:
-							ghosts[i].setDirection(-1, 0);
-							break;
-					}
-					x++;
-					np = ghosts[i].getNextPoint();
-				}
-			}
-		}
-
 		void PacmanGame::moveGhosts(void) {
 			Ghost* ghosts = map.getGhosts();
 			unsigned gcount = map.getGhostCount();
-
 			for(unsigned i = 0; i < gcount; i++) {
+				
+				if(ghosts[i].getDirection().x == 1) ghosts[i].setDirection(0,1);
+				else if(ghosts[i].getDirection().y == -1) ghosts[i].setDirection(1,0);
+				else if(ghosts[i].getDirection().x == -1) ghosts[i].setDirection(0,-1);
+				else if(ghosts[i].getDirection().y == 1) ghosts[i].setDirection(-1,0);
+
+				if(ghosttime < time(NULL)-10) ghosts[i].setDirection(ghosts[i].getDirection().x*-1, ghosts[i].getDirection().y*-1);
+
 				Point np = ghosts[i].getNextPoint();
 
-				Point pmd = pacman.getDirection();
-				int x=0;
-				while((!map.getTile(np.x,np.y).isWalkable()) && x < 4) {
-					switch(x) {
-						case 0:
-							ghosts[i].setDirection(1, 0);
-							break;
-						case 1:
-							ghosts[i].setDirection(0, -1);
-							break;
-						case 2:
-							ghosts[i].setDirection(0, 1);
-							break;
-						case 3:
-							ghosts[i].setDirection(-1, 0);
-							break;
+				while(!map.getTile(np.x,np.y).isWalkable()) {
+					int randnum = rand() % 2 + 1 == 1 ? 1 : -1;
+
+					if(ghosttime < time(NULL)-10) ghosts[i].setDirection(ghosts[i].getDirection().x*-1, ghosts[i].getDirection().y*-1);
+
+					if(ghosts[i].getDirection().x == 1) {
+						ghosts[i].setDirection(-1,0);
+						np = ghosts[i].getNextPoint();
+						if(!map.getTile(np.x,np.y).isWalkable())
+							ghosts[i].setDirection(0,-1);
 					}
-					x++;
+					else if(ghosts[i].getDirection().y == -1) { 
+						ghosts[i].setDirection(0,1);
+						np = ghosts[i].getNextPoint();
+						if(!map.getTile(np.x,np.y).isWalkable())
+							ghosts[i].setDirection(-1,0);
+					}
+					else if(ghosts[i].getDirection().x == -1) {
+						ghosts[i].setDirection(1,0);
+						np = ghosts[i].getNextPoint();
+						if(!map.getTile(np.x,np.y).isWalkable())
+							ghosts[i].setDirection(0,1);
+					}
+					else if(ghosts[i].getDirection().y == 1) {
+						ghosts[i].setDirection(0,-1);
+						np = ghosts[i].getNextPoint();
+						if(!map.getTile(np.x,np.y).isWalkable())
+							ghosts[i].setDirection(1,0);
+					}
+
+					//if(ghosttime < time(NULL)-10) ghosts[i].setDirection(ghosts[i].getDirection().x*-1, ghosts[i].getDirection().y*-1);
+
 					np = ghosts[i].getNextPoint();
 				}
 
@@ -308,6 +309,8 @@ namespace nadilus {
 
 				ghosts[i].move();
 			}
+
+			if(ghosttime < time(NULL)-20) this->ghosttime = (int) time(NULL);
 
 			//Tile& t2 = map.getTile(np.x,np.y);
 			//t2.setType(2);
