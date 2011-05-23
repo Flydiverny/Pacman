@@ -34,6 +34,9 @@ namespace nadilus {
 				bool playAgain();
 				Point drawPoint;
 				void printGhosts(void);
+				void moveGhosts(void);
+				void coutScore(int,int,int);
+				void initGhostMovements(void);
 		};
 	}
 }

@@ -8,6 +8,9 @@ namespace nadilus {
 				~Point(void);
 				int x;
 				int y;
+
+				friend bool operator==(Point,Point);
+				friend bool operator!=(Point,Point);
 		};
 	}
 }

@@ -100,7 +100,8 @@ namespace nadilus {
 			for(unsigned i = 0; i < gcount; i++) {
 				Point p = ghosts[i].getPoint();
 				gotoxy(p.x,p.y);
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 250);
+				int color = 251 + i < 256 ?  251 + i  : 251;
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
 				cout << (char) 2;
 			}
 		}
@@ -125,6 +126,8 @@ namespace nadilus {
 			int moveLoops = 4;
 			int currentLoop = 0;
 
+			initGhostMovements();
+
 			while(true) {
 				if(!map.hasFood()) break;
 				Sleep(50);
@@ -139,8 +142,6 @@ namespace nadilus {
 				}
 				
 				setScore(-1);
-
-				printGhosts();
 
 				printScore();
 				if(!map.hasFood()) break;
@@ -184,13 +185,7 @@ namespace nadilus {
 				if(i < 9) cout << " ";
 				cout << i+1 << " " << list.at(i).getName();
 
-				int score = list.at(i).getHighscore();
-				if(score < 10) gotoxy(map.getColumns()+2+splitter.length(),1+i);
-				else if(score < 100) gotoxy(map.getColumns()+2+splitter.length()-1,1+i);
-				else if(score < 1000) gotoxy(map.getColumns()+2+splitter.length()-2,1+i);
-				else if(score < 10000) gotoxy(map.getColumns()+2+splitter.length()-3,1+i);
-				else if(score < 100000) gotoxy(map.getColumns()+2+splitter.length()-4,1+i);
-				cout << score;
+				coutScore(list.at(i).getHighscore(), map.getColumns()+2+splitter.length(), 1+i);
 			}
 
 			gotoxy(map.getColumns()+3,map.getRows()-1);
@@ -202,15 +197,18 @@ namespace nadilus {
 					gotoxy(map.getColumns()+3,map.getRows());
 					cout << position << " " << player.getName();
 
-					int score = player.getHighscore();
-					if(score < 10) gotoxy(map.getColumns()+2+splitter.length(),map.getRows());
-					else if(score < 100) gotoxy(map.getColumns()+2+splitter.length()-1,map.getRows());
-					else if(score < 1000) gotoxy(map.getColumns()+2+splitter.length()-2,map.getRows());
-					else if(score < 10000) gotoxy(map.getColumns()+2+splitter.length()-3,map.getRows());
-					else if(score < 100000) gotoxy(map.getColumns()+2+splitter.length()-4,map.getRows());
-					cout << score;
+					coutScore(player.getHighscore(), map.getColumns()+2+splitter.length(), map.getRows());
 				}
 			}
+		}
+
+		void PacmanGame::coutScore(int score, int x, int y) {
+			if(score < 10) gotoxy(x,y);
+			else if(score < 100) gotoxy(x-1,y);
+			else if(score < 1000) gotoxy(x-2,y);
+			else if(score < 10000) gotoxy(x-3,y);
+			else if(score < 100000) gotoxy(x-4,y);
+			cout << score;
 		}
 
 		void PacmanGame::printScore(void) {
@@ -221,12 +219,7 @@ namespace nadilus {
 			gotoxy(map.getColumns()-7,-1);
 			cout << "       ";
 
-			if(score < 10) gotoxy(map.getColumns()-1,-1);
-			else if(score < 100) gotoxy(map.getColumns()-2,-1);
-			else if(score < 1000) gotoxy(map.getColumns()-3,-1);
-			else if(score < 10000) gotoxy(map.getColumns()-4,-1);
-			else if(score < 100000) gotoxy(map.getColumns()-5,-1);
-			cout << score;
+			coutScore(score, map.getColumns()-1, -1);
 		}
 
 		void PacmanGame::movePacman(void) {
@@ -250,25 +243,76 @@ namespace nadilus {
 			printPacman();
 		}
 
-		void PacmanGame::movePacman(void) {
-			Point np = pacman.getNextPoint();
-			if(!map.getTile(np.x,np.y).isWalkable()) return;
+		void PacmanGame::initGhostMovements(void) {
+			Ghost* ghosts = map.getGhosts();
+			unsigned gcount = map.getGhostCount();
 
-			Point pmp = pacman.getPoint();
+			for(unsigned i = 0; i < gcount; i++) {
+				ghosts[i].setDirection(1, 0);
+				Point np = ghosts[i].getNextPoint();
 
-			if(map.getTile(np.x,np.y).getType() == 0) setScore(50);
-			else if(pacman.isMoving()) setScore(-10);
+				int x=0;
+				while(!map.getTile(np.x,np.y).isWalkable() && x < 4) {
+					switch(x) {
+						case 0:
+							ghosts[i].setDirection(1, 0);
+							break;
+						case 1:
+							ghosts[i].setDirection(0, -1);
+							break;
+						case 2:
+							ghosts[i].setDirection(0, 1);
+							break;
+						case 3:
+							ghosts[i].setDirection(-1, 0);
+							break;
+					}
+					x++;
+					np = ghosts[i].getNextPoint();
+				}
+			}
+		}
 
-			
-			Tile& t = map.getTile(pmp.x,pmp.y);
-			Tile& t2 = map.getTile(np.x,np.y);
-			
-			t.setType(2);
-			t2.setType(2);
-			printTile(t);
+		void PacmanGame::moveGhosts(void) {
+			Ghost* ghosts = map.getGhosts();
+			unsigned gcount = map.getGhostCount();
 
-			pacman.move();
-			printPacman();
+			for(unsigned i = 0; i < gcount; i++) {
+				Point np = ghosts[i].getNextPoint();
+
+				Point pmd = pacman.getDirection();
+				int x=0;
+				while((!map.getTile(np.x,np.y).isWalkable()) && x < 4) {
+					switch(x) {
+						case 0:
+							ghosts[i].setDirection(1, 0);
+							break;
+						case 1:
+							ghosts[i].setDirection(0, -1);
+							break;
+						case 2:
+							ghosts[i].setDirection(0, 1);
+							break;
+						case 3:
+							ghosts[i].setDirection(-1, 0);
+							break;
+					}
+					x++;
+					np = ghosts[i].getNextPoint();
+				}
+
+				Point pmp = ghosts[i].getPoint();
+
+				Tile& t = map.getTile(pmp.x,pmp.y);
+				printTile(t);
+
+				ghosts[i].move();
+			}
+
+			//Tile& t2 = map.getTile(np.x,np.y);
+			//t2.setType(2);
+
+			printGhosts();
 		}
 
 

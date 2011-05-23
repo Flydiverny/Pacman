@@ -42,6 +42,10 @@ namespace nadilus {
 			}
 		}
 
+		Point Creature::getDirection(void) {
+			return Point(this->dx, this->dy);
+		}
+
 		void Creature::move(void) {
 			this->point = this->getNextPoint();
 		}
